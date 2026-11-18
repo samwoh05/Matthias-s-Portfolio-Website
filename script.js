@@ -86,13 +86,9 @@
     $$('.fade-in', scope).forEach((f) => {
       const delay = base + parseFloat(f.dataset.delay || 0.6);
       f.style.setProperty('--delay', `${delay}s`);
-      let d = 0.7;
-      if (f.classList.contains('svg-hand')) {
-        // handwritten labels write on at pen speed
-        d = clamp(f.textContent.length * 0.04, 0.35, 1.5);
-        f.style.setProperty('--wd', `${d.toFixed(2)}s`);
-      }
-      maxEnd = Math.max(maxEnd, delay + d);
+      // handwritten labels stay hidden until the pen writes them (see writeSvgText)
+      if (f.classList.contains('svg-hand')) f.style.clipPath = 'inset(-60% 100% -70% -10%)';
+      maxEnd = Math.max(maxEnd, delay + 0.7);
     });
     scope.dataset.end = String(maxEnd);
     scope.getBoundingClientRect();
@@ -108,6 +104,12 @@
       paths.forEach((p) => { p.style.strokeDashoffset = '0'; });
     }
     scope.classList.add('is-drawn');
+    if (!reduce) {
+      $$('.svg-hand.fade-in', scope)
+        .map((t) => ({ t, at: parseFloat(t.style.getPropertyValue('--delay')) || 0 }))
+        .sort((a, b) => a.at - b.at)
+        .forEach(({ t, at }) => writeSvgText(t, at));
+    }
     const end = parseFloat(scope.dataset.end || 0) * 1000 + 250;
     setTimeout(() => {
       paths.forEach((p) => { p.style.strokeDasharray = ''; p.style.strokeDashoffset = ''; p.style.transition = 'none'; });
@@ -387,28 +389,202 @@
     walk(el);
     return words;
   }
-  function prepWrite(el, base = 0) {
-    if (reduce || el.dataset.wr) return;
-    el.dataset.wr = '1';
-    let t = base;
-    splitWords(el).forEach((w) => {
-      const d = Math.max(0.12, w.textContent.length * 0.034);
-      w.style.setProperty('--wd', `${d.toFixed(3)}s`);
-      w.style.setProperty('--wdl', `${t.toFixed(3)}s`);
-      t += d + 0.06;
-    });
-    el.classList.add('wr');
+  // A small, repeatable random source per text, so each line has its own rhythm
+  function seeded(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+    h |= 1;
+    return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; };
   }
-  const writeTargets = $$('.quote-note q, .sec-note, .contact .sign, .given .tag, .therefore .tag, .gpa-note, .next-head .hand, .bench-note, .sheet-hint');
-  writeTargets.forEach((el) => prepWrite(el, 0.15));
-  const writeIO = new IntersectionObserver((entries) => {
+  // Pen time for one character: wide letters take longer, thin ones and marks are quick
+  const charTime = (ch, rand) => {
+    if (/\s/.test(ch)) return 0;
+    const k = /[mwMW]/.test(ch) ? 1.4 : /[iljtfr.,'’:;!|·]/.test(ch) ? 0.55 : 1;
+    return (0.045 + rand() * 0.03) * k;
+  };
+  const pauseAfter = (ch) => (/[,;:]/.test(ch) ? 0.16 : /[.!?—–…=+]/.test(ch) ? 0.24 : 0);
+
+  // One hand per sheet: writers in the same card/section wait their turn
+  const penQueues = new Map();
+  function enqueue(el, at, durMs) {
+    const key = el.closest('.card, .hero-sheet, section') || document.body;
+    const start = Math.max(at, (penQueues.get(key) || 0) + 160);
+    penQueues.set(key, start + durMs);
+    return start;
+  }
+
+  // Pencil, drawn tip-at-origin and angled up to the right
+  const PENCIL = '<g transform="rotate(-52)"><path class="pg" d="M0 0 6.5-2.3V2.3Z"/><path class="pw" d="M6.5-2.3 15-5.2V5.2L6.5 2.3Z"/><path class="pb" d="M15-5.2H46V5.2H15Z"/><path class="pl" d="M15 0H46"/><path class="pf" d="M46-5.2H51V5.2H46Z"/><path class="pe" d="M51-5.2H56Q58-5.2 58-3V3Q58 5.2 56 5.2H51Z"/></g>';
+
+  // Drives the pencil along pos(t) from `start` (ms) for `total` (s), then lifts it away
+  function runPen(pen, start, total, fs, pos, place, done) {
+    let finished = false;
+    const step = (now) => {
+      const t = (now - start) / 1000;
+      if (t < -0.2) { requestAnimationFrame(step); return; }
+      let p, o = 1, lift = 0;
+      if (t < 0) { p = pos(0); o = 1 + t / 0.2; lift = -t / 0.2; }
+      else if (t <= total) {
+        p = pos(t);
+        // the small up-and-down of forming letters
+        p = { x: p.x + Math.sin(now / 1000 * 2 * Math.PI * 11) * fs * 0.025, y: p.y + Math.sin(now / 1000 * 2 * Math.PI * 7.5) * fs * 0.06 };
+      } else {
+        if (!finished) { finished = true; if (done) done(); }
+        const k = Math.min(1, (t - total) / 0.4);
+        p = pos(total); o = 1 - k; lift = k;
+        if (k >= 1) { pen.remove(); return; }
+      }
+      place(p.x + lift * fs * 0.5, p.y - lift * fs * 0.8, o);
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // Offset of a node inside an ancestor (walks through positioned wrappers like .res)
+  function offsetIn(node, ancestor) {
+    let x = 0, y = 0, n = node;
+    while (n && n !== ancestor) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+    return { x, y };
+  }
+
+  function prepHand(el) {
+    if (reduce || el.dataset.hw) return;
+    el.dataset.hw = '1';
+    const rand = seeded(el.textContent);
+    splitWords(el).forEach((w) => {
+      w.style.setProperty('--wr', `${((rand() - 0.5) * 1.6).toFixed(2)}deg`);
+      w.style.setProperty('--wy', `${((rand() - 0.5) * 0.07).toFixed(3)}em`);
+    });
+    el.classList.add('hw');
+  }
+
+  // HTML text: each word inks in at its own pace, with pauses at gaps and punctuation
+  function writeHand(el, delayS, done) {
+    if (!el || reduce || !el.classList.contains('hw') || el.dataset.written) { if (done) done(); return; }
+    el.dataset.written = '1';
+    const words = $$('.w', el);
+    if (!words.length) { if (done) done(); return; }
+    const fs = parseFloat(getComputedStyle(el).fontSize) || 20;
+    const rand = seeded(`${el.textContent}·`);
+    let t = 0, prevTop = null;
+    const sched = words.map((w, i) => {
+      const o = offsetIn(w, el);
+      if (i > 0) {
+        t += 0.07 + rand() * 0.07 + pauseAfter(words[i - 1].textContent.slice(-1));
+        if (prevTop !== null && o.y > prevTop + fs * 0.5) t += 0.12;   // pen travels to the next line
+      }
+      prevTop = o.y;
+      let d = 0;
+      for (const ch of w.textContent) d += charTime(ch, rand);
+      d = Math.max(0.08, d * 1.15);
+      const s = { w, t, d, x: o.x, y: o.y, W: w.offsetWidth, H: w.offsetHeight };
+      t += d;
+      return s;
+    });
+    let total = t;
+    const k = total > 4.6 ? Math.max(0.55, 4.6 / total) : 1;   // long notes write a little faster
+    sched.forEach((s) => { s.t *= k; s.d *= k; });
+    total *= k;
+    const start = enqueue(el, performance.now() + delayS * 1000, total * 1000);
+    const lead = (start - performance.now()) / 1000;
+    sched.forEach((s) => {
+      s.w.style.setProperty('--wd', `${s.d.toFixed(3)}s`);
+      s.w.style.setProperty('--wdl', `${(lead + s.t).toFixed(3)}s`);
+    });
+    el.getBoundingClientRect();
+    el.classList.add('hw-go');
+
+    const baseline = (s) => s.y + s.H - fs * 0.5;
+    const pos = (time) => {
+      let i = 0;
+      while (i < sched.length - 1 && time >= sched[i + 1].t) i++;
+      const s = sched[i];
+      const f = (time - s.t) / s.d;
+      if (f <= 1) return { x: s.x + clamp(-0.1 * s.W + 1.2 * s.W * f, 0, s.W), y: baseline(s) };
+      const n = sched[i + 1];                                  // between words: glide to the next one
+      if (!n) return { x: s.x + s.W, y: baseline(s) };
+      const g = clamp((time - s.t - s.d) / Math.max(0.01, n.t - s.t - s.d), 0, 1);
+      return { x: lerp(s.x + s.W, n.x, g), y: lerp(baseline(s), baseline(n), g) - Math.sin(g * Math.PI) * fs * 0.18 };
+    };
+    const pen = document.createElement('span');
+    pen.className = `pen${el.closest('.paper') ? ' pen--paper' : ''}`;
+    pen.setAttribute('aria-hidden', 'true');
+    const sc = fs / 24;
+    pen.innerHTML = `<svg width="${(48 * sc).toFixed(1)}" height="${(58 * sc).toFixed(1)}" viewBox="-6 -52 48 58">${PENCIL}</svg>`;
+    el.appendChild(pen);
+    const place = (x, y, o) => {
+      pen.style.opacity = o.toFixed(2);
+      pen.style.transform = `translate(${(x - 6 * sc).toFixed(1)}px, ${(y - 52 * sc).toFixed(1)}px)`;
+    };
+    runPen(pen, start, total, fs, pos, place, done);
+  }
+
+  // Handwritten SVG labels in the sketches: revealed letter by letter behind the pencil
+  function writeSvgText(txt, delayS) {
+    const reveal = () => { txt.style.clipPath = 'none'; };
+    let n = 0, bb, xs = [];
+    try {
+      n = txt.getNumberOfChars();
+      bb = txt.getBBox();
+      for (let i = 0; i < n; i++) xs.push([txt.getStartPositionOfChar(i), txt.getEndPositionOfChar(i)]);
+    } catch (e) { n = 0; }
+    if (!n || !bb || !bb.width) { reveal(); return; }
+    const fs = parseFloat(txt.getAttribute('font-size')) || 20;
+    const rand = seeded(txt.textContent);
+    const chars = Array.from(txt.textContent);
+    let t = 0;
+    const sched = xs.map(([a, b], i) => {
+      const ch = chars[i] || '';
+      const d = /\s/.test(ch) ? 0.07 + rand() * 0.07 : Math.max(0.025, charTime(ch, rand));
+      const s = { x0: a.x, x1: b.x, y: a.y, t, d };
+      t += d + pauseAfter(ch) * 0.6;
+      return s;
+    });
+    let total = t;
+    const k = total > 2.6 ? 2.6 / total : 1;
+    sched.forEach((s) => { s.t *= k; s.d *= k; });
+    total *= k;
+    const start = enqueue(txt, performance.now() + delayS * 1000, total * 1000);
+    const right = bb.x + bb.width;
+    const pos = (time) => {
+      let i = 0;
+      while (i < sched.length - 1 && time >= sched[i + 1].t) i++;
+      const s = sched[i];
+      const f = clamp((time - s.t) / s.d, 0, 1);
+      return { x: lerp(s.x0, s.x1, f), y: s.y - fs * 0.12 };
+    };
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', `pen-g${txt.closest('.paper') ? ' pen--paper' : ''}`);
+    g.setAttribute('aria-hidden', 'true');
+    g.innerHTML = PENCIL;
+    txt.parentNode.appendChild(g);
+    const sc = fs / 24;
+    let writing = false;
+    const place = (x, y, o) => {
+      g.style.opacity = o.toFixed(2);
+      g.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${sc.toFixed(3)})`);
+      const now = (performance.now() - start) / 1000;
+      if (now >= 0 && now <= total) {
+        writing = true;
+        const front = pos(now).x;
+        txt.style.clipPath = `inset(-60% ${Math.max(0, right - front).toFixed(1)}px -70% -10%)`;
+      } else if (writing && now > total) {
+        reveal();
+      }
+    };
+    runPen(g, start, total, fs, pos, place, reveal);
+  }
+
+  const handTargets = $$('.quote-note q, .sec-note, .contact .sign, .given .tag, .therefore .tag, .gpa-note, .next-head .hand, .bench-note, .sheet-hint');
+  handTargets.forEach(prepHand);
+  const handIO = new IntersectionObserver((entries) => {
     entries.forEach((en) => {
       if (!en.isIntersecting) return;
-      en.target.classList.add('is-writing');
-      writeIO.unobserve(en.target);
+      writeHand(en.target, 0.15);
+      handIO.unobserve(en.target);
     });
   }, { threshold: 0.6, rootMargin: '0px 0px -8% 0px' });
-  writeTargets.forEach((el) => writeIO.observe(el));
+  handTargets.forEach((el) => handIO.observe(el));
 
   /* ----------------------------------------------------------
      Hero entrance
@@ -419,13 +595,14 @@
     const eq = $('#eq-box');
     if (eq) prepDraw(eq);
     const eqLine = $('.eq');
-    if (eqLine) prepWrite(eqLine, 0.55);
+    if (eqLine) prepHand(eqLine);
 
     const go = () => {
       root.classList.add('is-loaded');
-      if (eqLine) eqLine.classList.add('is-writing');
+      // write the equation, then box the answer
+      if (eqLine) writeHand(eqLine, 0.6, () => drawNow(eq));
+      else drawNow(eq);
       setTimeout(() => drawNow(gearSvg), reduce ? 0 : 250);
-      setTimeout(() => drawNow(eq), reduce ? 0 : 200);
     };
     const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
     Promise.race([fontsReady, new Promise((r) => setTimeout(r, 900))]).then(() => requestAnimationFrame(go));

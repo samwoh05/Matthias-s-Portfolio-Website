@@ -203,17 +203,43 @@ h1, h2, h3 { font-weight: 400; }
 }
 .js .draw.is-drawn .fade-in { opacity: 1; }
 
-/* Handwriting write-on: words ink in left to right, like a pen */
-.wr .w {
+/* Handwriting: each word inks in behind a soft leading edge, at its own pace,
+   with a slightly uneven baseline; a pencil rides the writing point (script.js) */
+.hw { position: relative; }
+.hw .w {
   display: inline-block;
-  clip-path: inset(-.4em 100% -.5em -.2em);
-  transition: clip-path var(--wd, .3s) cubic-bezier(.35, .05, .6, .95) var(--wdl, 0s);
+  white-space: nowrap;
+  padding: .12em .18em .32em;
+  margin: -.12em -.18em -.32em;
+  transform: rotate(var(--wr, 0deg)) translateY(var(--wy, 0));
+  -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+          mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  -webkit-mask-size: 220% 100%;
+          mask-size: 220% 100%;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-position: 100% 0;
+          mask-position: 100% 0;
 }
-.wr.is-writing .w { clip-path: inset(-.4em -.3em -.5em -.2em); }
+.hw.hw-go .w {
+  -webkit-mask-position: 0 0;
+          mask-position: 0 0;
+  transition: -webkit-mask-position var(--wd, .3s) linear var(--wdl, 0s), mask-position var(--wd, .3s) linear var(--wdl, 0s);
+}
+.pen { position: absolute; left: 0; top: 0; z-index: 3; overflow: visible; pointer-events: none; opacity: 0; will-change: transform, opacity; filter: drop-shadow(1px 3px 2px rgba(4, 22, 12, .32)); }
+.pen, .pen-g { --pen-body: #f1e7d2; --pen-line: #174a31; }
+.pen--paper { --pen-body: #1d5a3c; --pen-line: #2a2118; }
+.pen-g { pointer-events: none; opacity: 0; filter: drop-shadow(1px 2px 1.5px rgba(42, 33, 24, .3)); }
+.pen .pg, .pen-g .pg { fill: #2a2118; }
+.pen .pw, .pen-g .pw { fill: #e2c896; stroke: #5b4632; stroke-width: .6; }
+.pen .pb, .pen-g .pb { fill: var(--pen-body); stroke: var(--pen-line); stroke-width: .7; }
+.pen .pl, .pen-g .pl { fill: none; stroke: var(--pen-line); stroke-width: .5; opacity: .45; }
+.pen .pf, .pen-g .pf { fill: #b9b3a2; stroke: #5b4632; stroke-width: .6; }
+.pen .pe, .pen-g .pe { fill: #c98a7a; stroke: #5b4632; stroke-width: .6; }
 .js .draw .svg-hand.fade-in {
   opacity: 1;
   clip-path: inset(-30% 100% -40% -4%);
-  transition: clip-path var(--wd, .8s) cubic-bezier(.35, .05, .6, .95) var(--delay, 0s);
+  transition: none;   /* script.js reveals these frame by frame behind the pencil */
 }
 .js .draw.is-drawn .svg-hand.fade-in { clip-path: inset(-30% -4% -40% -4%); }
 .js .draw.is-drawn .fade-in.blue,
@@ -1022,7 +1048,9 @@ input[type="range"]::-moz-range-thumb {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
   .js .reveal, .js .hero [data-in], .js .draw .fade-in { opacity: 1 !important; transform: none !important; }
-  .wr .w, .js .draw .svg-hand.fade-in { clip-path: none !important; }
+  .js .draw .svg-hand.fade-in { clip-path: none !important; }
+  .hw .w { -webkit-mask: none !important; mask: none !important; transform: none !important; }
+  .pen, .pen-g { display: none !important; }
   .js .hero h1 .line > span { transform: none !important; }
   .js .hero .hero-sheet[data-in] { transform: none !important; }
   .anim-swing { transform: rotate(-30deg); }
