@@ -60,7 +60,7 @@ body {
   font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: clip;
+  overflow: clip;
   background-color: var(--mat);
   background-image:
     linear-gradient(rgb(var(--mat-line) / .2) 1px, transparent 1px),
@@ -202,6 +202,20 @@ h1, h2, h3 { font-weight: 400; }
   transition: opacity .7s var(--ease) var(--delay, 0s);
 }
 .js .draw.is-drawn .fade-in { opacity: 1; }
+
+/* Handwriting write-on: words ink in left to right, like a pen */
+.wr .w {
+  display: inline-block;
+  clip-path: inset(-.4em 100% -.5em -.2em);
+  transition: clip-path var(--wd, .3s) cubic-bezier(.35, .05, .6, .95) var(--wdl, 0s);
+}
+.wr.is-writing .w { clip-path: inset(-.4em -.3em -.5em -.2em); }
+.js .draw .svg-hand.fade-in {
+  opacity: 1;
+  clip-path: inset(-30% 100% -40% -4%);
+  transition: clip-path var(--wd, .8s) cubic-bezier(.35, .05, .6, .95) var(--delay, 0s);
+}
+.js .draw.is-drawn .svg-hand.fade-in { clip-path: inset(-30% -4% -40% -4%); }
 .js .draw.is-drawn .fade-in.blue,
 .js .draw.is-drawn .fade-in.blue-dash { opacity: .6; }
 
@@ -372,15 +386,9 @@ h1, h2, h3 { font-weight: 400; }
   display: inline-flex; align-items: center; gap: 12px;
   text-decoration: none;
 }
-.brand-mark {
-  position: relative;
-  width: 42px; height: 42px;
-  display: grid; place-items: center;
-  font: 600 13px/1 var(--f-mono);
-  letter-spacing: .06em;
-}
-.brand-mark svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.brand-mark path { fill: none; stroke: var(--mat-ink); stroke-width: 1.4; stroke-linecap: round; }
+.brand-mark { display: block; flex: none; width: 50px; height: 39px; }
+.brand-mark svg { width: 100%; height: 100%; }
+.brand-mark path { fill: var(--mat-ink); }
 .brand-name { font-size: 16px; letter-spacing: -.01em; }
 .brand-name small { display: block; font: 500 9.5px/1.2 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--mat-ink-3); margin-top: 3px; }
 
@@ -681,7 +689,7 @@ h1, h2, h3 { font-weight: 400; }
   border-top: 1px dashed rgba(61, 82, 184, .4);
   color: var(--pencil);
 }
-.quote-note q { font-family: var(--f-hand); font-size: clamp(24px, 2.2vw, 30px); line-height: 1.2; quotes: "\201C" "\201D"; }
+.quote-note q { font-family: var(--f-hand); font-size: clamp(24px, 2.2vw, 30px); line-height: 1.2; quotes: none; }
 .quote-note .mono { color: var(--pencil); opacity: .85; }
 
 /* range inputs: drafting-scale style */
@@ -917,12 +925,13 @@ input[type="range"]::-moz-range-thumb {
 .testimony .t-body { margin: 18px 0 0; padding-top: 16px; border-top: 1px dashed rgba(61, 82, 184, .4); }
 .testimony .t-body p { font-size: 15.5px; line-height: 1.62; color: var(--ink-2); }
 .testimony mark { color: var(--ink); background: linear-gradient(transparent 58%, rgba(61, 82, 184, .16) 58%, rgba(61, 82, 184, .16) 92%, transparent 92%); padding: 0 1px; }
-.testimony figcaption { margin-top: 22px; padding-top: 14px; border-top: 1px solid rgba(42, 33, 24, .25); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.testimony figcaption { margin-top: 22px; padding-top: 14px; border-top: 1px solid rgba(42, 33, 24, .25); display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
+.testimony .t-name { font-size: 18px; font-weight: 500; letter-spacing: -.01em; }
 
 .site-foot { padding: 0 0 40px; }
 .title-block {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr .8fr .8fr;
+  grid-template-columns: 2fr 1fr 1fr;
   border: 1.5px solid rgb(var(--mat-ink-rgb) / .55);
   color: var(--mat-ink-2);
 }
@@ -1012,6 +1021,7 @@ input[type="range"]::-moz-range-thumb {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
   .js .reveal, .js .hero [data-in], .js .draw .fade-in { opacity: 1 !important; transform: none !important; }
+  .wr .w, .js .draw .svg-hand.fade-in { clip-path: none !important; }
   .js .hero h1 .line > span { transform: none !important; }
   .js .hero .hero-sheet[data-in] { transform: none !important; }
   .anim-swing { transform: rotate(-30deg); }

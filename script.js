@@ -86,7 +86,13 @@
     $$('.fade-in', scope).forEach((f) => {
       const delay = base + parseFloat(f.dataset.delay || 0.6);
       f.style.setProperty('--delay', `${delay}s`);
-      maxEnd = Math.max(maxEnd, delay + 0.7);
+      let d = 0.7;
+      if (f.classList.contains('svg-hand')) {
+        // handwritten labels write on at pen speed
+        d = clamp(f.textContent.length * 0.04, 0.35, 1.5);
+        f.style.setProperty('--wd', `${d.toFixed(2)}s`);
+      }
+      maxEnd = Math.max(maxEnd, delay + d);
     });
     scope.dataset.end = String(maxEnd);
     scope.getBoundingClientRect();
@@ -354,6 +360,57 @@
   }
 
   /* ----------------------------------------------------------
+     Handwriting write-on (HTML text set in the hand font)
+     ---------------------------------------------------------- */
+  function splitWords(el) {
+    const words = [];
+    const walk = (node) => {
+      Array.from(node.childNodes).forEach((n) => {
+        if (n.nodeType === 3) {
+          if (!n.textContent.trim()) return;
+          const frag = document.createDocumentFragment();
+          n.textContent.split(/(\s+)/).forEach((part) => {
+            if (!part) return;
+            if (!part.trim()) { frag.appendChild(document.createTextNode(part)); return; }
+            const s = document.createElement('span');
+            s.className = 'w';
+            s.textContent = part;
+            frag.appendChild(s);
+            words.push(s);
+          });
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1 && n.namespaceURI !== NS) {
+          walk(n);
+        }
+      });
+    };
+    walk(el);
+    return words;
+  }
+  function prepWrite(el, base = 0) {
+    if (reduce || el.dataset.wr) return;
+    el.dataset.wr = '1';
+    let t = base;
+    splitWords(el).forEach((w) => {
+      const d = Math.max(0.12, w.textContent.length * 0.034);
+      w.style.setProperty('--wd', `${d.toFixed(3)}s`);
+      w.style.setProperty('--wdl', `${t.toFixed(3)}s`);
+      t += d + 0.06;
+    });
+    el.classList.add('wr');
+  }
+  const writeTargets = $$('.quote-note q, .sec-note, .contact .sign, .given .tag, .therefore .tag, .gpa-note, .next-head .hand, .bench-note, .sheet-hint');
+  writeTargets.forEach((el) => prepWrite(el, 0.15));
+  const writeIO = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('is-writing');
+      writeIO.unobserve(en.target);
+    });
+  }, { threshold: 0.6, rootMargin: '0px 0px -8% 0px' });
+  writeTargets.forEach((el) => writeIO.observe(el));
+
+  /* ----------------------------------------------------------
      Hero entrance
      ---------------------------------------------------------- */
   function boot() {
@@ -361,9 +418,12 @@
     if (gearSvg) { gearSvg.dataset.step = '0'; prepDraw(gearSvg); }
     const eq = $('#eq-box');
     if (eq) prepDraw(eq);
+    const eqLine = $('.eq');
+    if (eqLine) prepWrite(eqLine, 0.55);
 
     const go = () => {
       root.classList.add('is-loaded');
+      if (eqLine) eqLine.classList.add('is-writing');
       setTimeout(() => drawNow(gearSvg), reduce ? 0 : 250);
       setTimeout(() => drawNow(eq), reduce ? 0 : 200);
     };
@@ -440,7 +500,10 @@
   const PX_MM = 0.2646;
   function buildRuler() {
     if (!ruler || !cadMQ.matches) return;
+    // measure the page without the ruler itself, so it can shrink as well as grow
+    ruler.style.height = '0px';
     const h = document.documentElement.scrollHeight;
+    ruler.style.height = '';
     root.style.setProperty('--doc-h', `${h}px`);
     const want = Math.floor(h / 37.8);
     if (ruler.childElementCount === want) return;
