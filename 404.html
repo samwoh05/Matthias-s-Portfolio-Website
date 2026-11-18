@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sheet not found — Matthias Luc Ang</title>
+  <meta name="description" content="This page doesn't exist. Head back to Matthias Luc Ang's portfolio.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#1d5a3c">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='221 196 600 600'%3E%3Crect x='221' y='196' width='600' height='600' rx='110' fill='%23E5DBC7'/%3E%3Cpath fill='%2312503F' d='M257 383 344 452 450 355V700L401 662V471L347 519 305 488V640H257ZM471 335 519 292V657H667L689 700H471ZM622 383 785 700H722L680 614H566L586 572H657L614 487 535 627V533Z'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..400&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <!-- Self-contained on purpose: GitHub Pages serves this file at any broken URL depth, where relative links to styles.css would break. -->
+  <style>
+    html, body { background: #1d5a3c; }
+    :root {
+      --mat: #1d5a3c; --mat-deep: #174a31; --mat-line: 143 198 161;
+      --mat-ink: #e9f2e4; --mat-ink-rgb: 233 242 228; --mat-ink-2: #c3d9c6; --mat-ink-3: #a9c9b2;
+      --paper: #f1e7d2; --paper-2: #e7d9bb; --ink: #2a2118; --ink-2: #5b4632; --ink-3: #8a7356; --pencil: #3d52b8;
+      --f-display: "Fraunces", Georgia, serif; --f-hand: "Caveat", "Segoe Print", cursive; --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+      --ease-out: cubic-bezier(.22, 1, .36, 1); --ease: cubic-bezier(.4, 0, .2, 1);
+      --gutter: clamp(20px, 5vw, 56px);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    * { margin: 0; }
+    html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
+    body {
+      min-height: 100vh; min-height: 100dvh;
+      display: flex; flex-direction: column;
+      color: var(--mat-ink); font-family: var(--f-display); font-size: 17px; line-height: 1.55;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+      background-color: var(--mat);
+      background-image:
+        linear-gradient(rgb(var(--mat-line) / .2) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(var(--mat-line) / .2) 1px, transparent 1px),
+        linear-gradient(rgb(var(--mat-line) / .075) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(var(--mat-line) / .075) 1px, transparent 1px);
+      background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+    body::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse 120% 90% at 50% 40%, transparent 55%, rgba(4, 22, 12, .34) 100%); }
+    ::selection { background: rgba(233, 242, 228, .28); }
+    a { color: inherit; }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    :focus-visible { outline: 2px dashed var(--mat-ink); outline-offset: 4px; border-radius: 4px; }
+    .wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 var(--gutter); }
+    .mono { font: 500 11.5px/1.3 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; }
+
+    header { position: relative; z-index: 2; display: flex; justify-content: center; padding: 22px 0 8px; }
+    .brand { display: block; width: 56px; height: 44px; }
+    .brand svg { width: 100%; height: 100%; display: block; }
+    .brand path { fill: var(--mat-ink); }
+
+    main { position: relative; z-index: 2; flex: 1; display: flex; align-items: center; padding: clamp(24px, 5vw, 56px) 0; }
+    .grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
+
+    .kicker { display: inline-flex; align-items: center; gap: 12px; color: var(--mat-ink-3); }
+    .kicker::before { content: ""; width: 32px; height: 1px; background: currentColor; }
+    h1 { margin-top: 22px; font-weight: 400; font-size: clamp(44px, 6.6vw, 96px); line-height: .94; letter-spacing: -.035em; }
+    h1 em { font-style: italic; font-weight: 300; color: var(--mat-ink-2); }
+    .note {
+      margin-top: 22px; font-family: var(--f-hand); font-weight: 600; font-size: clamp(23px, 2.3vw, 30px); line-height: 1.2; color: var(--mat-ink);
+      transform: rotate(-1.5deg); transform-origin: left;
+    }
+    .note span { display: inline-block; animation: write 1.3s cubic-bezier(.35, .05, .6, .95) .5s both; }
+    @keyframes write { from { clip-path: inset(-.4em 100% -.5em -.2em); } to { clip-path: inset(-.4em -.3em -.5em -.2em); } }
+    .lede { margin-top: 18px; max-width: 30rem; color: var(--mat-ink-2); font-size: clamp(16px, 1.3vw, 18px); }
+    .ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
+    .btn {
+      --b-bg: var(--mat-ink); --b-fg: var(--mat-deep); --b-line: var(--mat-ink);
+      position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1.5px solid var(--b-line);
+      background: var(--b-bg); color: var(--b-fg); text-decoration: none; white-space: nowrap;
+      font: 500 12.5px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase;
+      transition: transform .25s var(--ease-out), background-color .25s var(--ease);
+    }
+    .btn::after { content: ""; position: absolute; inset: -5px -4px -3px -6px; border: 1px solid var(--b-line); border-radius: 999px; opacity: 0; transform: rotate(-1.2deg) scale(.98); transition: opacity .25s var(--ease), transform .35s var(--ease-out); pointer-events: none; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:hover::after { opacity: .55; transform: rotate(-1.2deg) scale(1); }
+    .btn:active { transform: scale(.97); }
+    .btn svg { width: 16px; height: 16px; }
+    .btn--ghost { --b-bg: transparent; --b-fg: var(--mat-ink); --b-line: rgb(var(--mat-ink-rgb) / .55); }
+
+    .sheet {
+      position: relative; color: var(--ink); border-radius: 3px; transform: rotate(-1.4deg);
+      box-shadow: 0 1px 1px rgba(6, 24, 14, .25), 0 8px 18px rgba(6, 24, 14, .28), 0 26px 50px rgba(6, 24, 14, .22), inset 0 0 46px rgba(140, 105, 60, .13);
+      background:
+        linear-gradient(var(--ink-3), var(--ink-3)) 12px 12px / 14px 1px no-repeat,
+        linear-gradient(var(--ink-3), var(--ink-3)) 12px 12px / 1px 14px no-repeat,
+        linear-gradient(var(--ink-3), var(--ink-3)) right 12px bottom 12px / 14px 1px no-repeat,
+        linear-gradient(var(--ink-3), var(--ink-3)) right 12px bottom 12px / 1px 14px no-repeat,
+        radial-gradient(ellipse at 28% 18%, rgba(255, 252, 244, .55), transparent 62%),
+        var(--paper);
+    }
+    .sheet svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+    .gear-b { cursor: grab; touch-action: none; }
+    .dragging .gear-b { cursor: grabbing; }
+    .tooth { fill: var(--paper); stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; }
+    .tooth-back { fill: var(--paper-2); stroke: var(--ink-2); stroke-width: .9; }
+    .rim { fill: none; stroke: var(--ink); stroke-width: 1.1; }
+    .web { fill: url(#hatch); }
+    .hub { fill: var(--paper); stroke: var(--ink); stroke-width: 1.4; }
+    .bore { fill: var(--paper-2); stroke: var(--ink); stroke-width: 1.2; }
+    .hole { fill: var(--paper); stroke: var(--ink); stroke-width: 1.2; }
+    .blue { fill: none; stroke: var(--pencil); stroke-width: 1.1; }
+    .blue-dash { fill: none; stroke: var(--pencil); stroke-width: 1; stroke-dasharray: 5 5; opacity: .55; }
+    .hand { font-family: var(--f-hand); font-weight: 600; fill: var(--ink); }
+    .hand.b { fill: var(--pencil); }
+    .smono { font-family: var(--f-mono); font-weight: 500; fill: var(--ink-2); letter-spacing: .08em; text-transform: uppercase; }
+    .sheet-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 16px; padding: 0 22px 20px; }
+    .sheet-foot .mono { color: var(--ink-2); font-size: 10.5px; }
+    .fix { min-height: 40px; padding: 0 16px; border-radius: 99px; border: 1px solid rgba(42, 33, 24, .5); background: transparent; color: var(--ink); font: 500 11px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; transition: background-color .2s, color .2s; }
+    .fix:hover { background: var(--ink); color: var(--paper); }
+    .fix:focus-visible { outline-color: var(--pencil); }
+
+    footer { position: relative; z-index: 2; padding: 18px 0 26px; }
+    footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; color: var(--mat-ink-3); }
+    footer .mono { font-size: 10.5px; }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: minmax(0, 1fr); }
+      .sheet { max-width: 640px; }
+    }
+    @media (max-width: 560px) {
+      body { font-size: 16px; }
+      header { padding-top: 18px; }
+      .brand { width: 50px; height: 39px; }
+      .sheet { transform: rotate(-.8deg); }
+      .ctas .btn { flex: 1 1 100%; }
+      .sheet-foot { padding: 0 16px 16px; }
+      .smono { display: none; }
+      .hand { font-size: 30px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- data-home: the script points this at the site root (works on GitHub Pages at any depth) -->
+    <a class="brand" href="/Matthias-s-Portfolio-Website/" data-home aria-label="Matthias Luc Ang, home">
+      <svg viewBox="250 285 545 422" aria-hidden="true"><path d="M257 383 344 452 450 355V700L401 662V471L347 519 305 488V640H257ZM471 335 519 292V657H667L689 700H471ZM622 383 785 700H722L680 614H566L586 572H657L614 487 535 627V533Z"/></svg>
+    </a>
+  </header>
+
+  <main>
+    <div class="wrap grid">
+      <div>
+        <p class="kicker mono">Error 404 · Sheet not found</p>
+        <h1>This sheet <em>isn't in the set.</em></h1>
+        <p class="note" id="note"><span>the gears don't mesh — so nothing turns.</span></p>
+        <p class="lede">The page you're looking for was never drawn, or it's been filed somewhere else. The main drawing is one click away.</p>
+        <div class="ctas">
+          <a class="btn" href="/Matthias-s-Portfolio-Website/" data-home>Back to the portfolio
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M8.5 3.5 13 8l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn--ghost" href="mailto:matthiaslucang@gmail.com">Email Matthias</a>
+        </div>
+      </div>
+
+      <figure class="sheet">
+        <svg id="stage" viewBox="0 0 600 420" role="img" aria-label="Two gears drawn in ink. The small one has slipped out of mesh, leaving a 4.04 millimetre gap, so it doesn't turn. Drag it back, or use the Fix it button.">
+          <defs>
+            <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(42)"><path d="M0 0V5" stroke="#5b4632" stroke-width=".9" opacity=".7"/></pattern>
+            <marker id="ab" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M1 1.5 8 5 1 8.5" fill="none" stroke="#3d52b8" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></marker>
+          </defs>
+          <g id="construct"></g>
+          <g id="backs"></g>
+          <g id="faces"></g>
+          <path class="blue" id="dim" marker-start="url(#ab)" marker-end="url(#ab)" d=""/>
+          <path class="blue" id="lead" d=""/>
+          <text class="hand b" id="gap" x="0" y="0" font-size="26">gap = 4.04 mm</text>
+          <text class="smono" id="gap2" x="0" y="0" font-size="10">should be 0.00</text>
+          <text class="hand" x="36" y="62" font-size="27">motor side — turning</text>
+          <text class="hand" id="label-b" x="0" y="0" font-size="27">stalled</text>
+          <text class="hand b" id="hint" x="578" y="400" font-size="22" text-anchor="end">drag the loose gear back in ↖</text>
+        </svg>
+        <div class="sheet-foot">
+          <span class="mono">Fig. 404 — Missing mesh · Scale 10:1</span>
+          <button class="fix" type="button" id="fix">Fix it for me</button>
+        </div>
+      </figure>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span class="mono">Matthias Luc Ang · Portfolio</span>
+      <span class="mono">Drawn by M. L. Ang · 2026</span>
+    </div>
+  </footer>
+
+  <script>
+  (() => {
+    'use strict';
+    // Point every "home" link at the real site root (GitHub Pages project sites live under /<repo>/).
+    const home = (() => {
+      if (location.protocol === 'file:') return 'index.html';
+      if (location.hostname.endsWith('github.io')) {
+        const seg = location.pathname.split('/').filter(Boolean)[0];
+        return seg && seg !== '404.html' ? `/${seg}/` : '/';
+      }
+      return '/';
+    })();
+    document.querySelectorAll('[data-home]').forEach((a) => { a.href = home; });
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const svg = document.getElementById('stage');
+    const mk = (t, a, p) => { const n = document.createElementNS(NS, t); for (const k in a) n.setAttribute(k, a[k]); p && p.appendChild(n); return n; };
+    const f2 = (n) => n.toFixed(2);
+    const m = 7;
+    const A = { z: 24, x: 196, y: 214 };
+    const B = { z: 16 };
+    [A, B].forEach((g) => { g.r = m * g.z / 2; g.p = 2 * Math.PI / g.z; });
+    const CD = A.r + B.r;                         // centre distance when meshed
+    const GAP0 = 40;                              // drawn gap, in drawing units
+    const MM = 4.04 / GAP0;                       // drawing scale: the starting gap reads 4.04 mm
+
+    const P = (r, a) => `${f2(r * Math.cos(a))} ${f2(r * Math.sin(a))}`;
+    const circ = (R, cx = 0, cy = 0) => `M${f2(cx + R)} ${f2(cy)}A${f2(R)} ${f2(R)} 0 1 1 ${f2(cx - R)} ${f2(cy)}A${f2(R)} ${f2(R)} 0 1 1 ${f2(cx + R)} ${f2(cy)}Z`;
+    function tooth(g) {
+      const ra = g.r + m, rf = g.r - 1.25 * m, p = g.p;
+      let d = `M${P(rf, -0.3 * p)}`;
+      for (let i = 0; i < g.z; i++) {
+        const a = i * p;
+        d += `L${P(ra, a - 0.14 * p)}A${f2(ra)} ${f2(ra)} 0 0 1 ${P(ra, a + 0.14 * p)}L${P(rf, a + 0.3 * p)}A${f2(rf)} ${f2(rf)} 0 0 1 ${P(rf, a + 0.7 * p)}`;
+      }
+      return d + 'Z';
+    }
+    function build(g, cls) {
+      const t = tooth(g);
+      g.back = mk('g', {}, document.getElementById('backs'));
+      mk('path', { d: t, class: 'tooth-back' }, g.back);
+      g.face = mk('g', { class: cls || '' }, document.getElementById('faces'));
+      const rr = g.r - 2.15 * m, rh = Math.max(11, g.r * .26);
+      const holes = g.z >= 20 ? 6 : 4, ringR = (rr + rh) / 2, holeR = (rr - rh) * .3;
+      let web = circ(rr) + circ(rh);
+      const hd = [];
+      for (let j = 0; j < holes; j++) { const a = j * 2 * Math.PI / holes + Math.PI / holes; const h = circ(holeR, ringR * Math.cos(a), ringR * Math.sin(a)); web += h; hd.push(h); }
+      mk('path', { d: t, class: 'tooth' }, g.face);
+      mk('path', { d: web, class: 'web', 'fill-rule': 'evenodd' }, g.face);
+      mk('path', { d: circ(rr), class: 'rim' }, g.face);
+      hd.forEach((h) => mk('path', { d: h, class: 'hole' }, g.face));
+      mk('path', { d: circ(rh), class: 'hub' }, g.face);
+      mk('path', { d: circ(rh * .45), class: 'bore' }, g.face);
+      mk('path', { d: t, fill: 'none', stroke: '#2a2118', 'stroke-width': .7, opacity: .5, transform: 'translate(1 -.8)' }, g.face);
+      mk('circle', { r: f2(g.r + m), fill: 'transparent' }, g.face);
+    }
+    build(A);
+    build(B, 'gear-b');
+
+    // construction: centre lines + pitch circle for A
+    const con = document.getElementById('construct');
+    mk('path', { d: `M${A.x - A.r - 30} ${A.y}H${A.x + A.r + 30}M${A.x} ${A.y - A.r - 30}V${A.y + A.r + 30}`, class: 'blue-dash' }, con);
+    mk('circle', { cx: A.x, cy: A.y, r: A.r, class: 'blue-dash' }, con);
+    const bCross = mk('path', { class: 'blue-dash' }, con);
+
+    // B starts loose: 4.04 mm out of mesh, a little below the line of centres
+    let phi = 0.2;
+    B.x = A.x + (CD + GAP0) * Math.cos(phi);
+    B.y = A.y + (CD + GAP0) * Math.sin(phi);
+    let theta = 0, rotB = 0.4, meshed = false, tween = null, drag = null;
+
+    const dim = document.getElementById('dim'), lead = document.getElementById('lead');
+    const gapT = document.getElementById('gap'), gap2 = document.getElementById('gap2');
+    const labelB = document.getElementById('label-b'), hint = document.getElementById('hint');
+    const note = document.getElementById('note'), fixBtn = document.getElementById('fix');
+
+    const meshRot = (ph) => -(A.z / B.z) * theta + (ph + Math.PI - B.p * (0.5 - ph / A.p));
+
+    function paint() {
+      const deg = (r) => (r * 180 / Math.PI).toFixed(3);
+      A.face.setAttribute('transform', `translate(${A.x} ${A.y}) rotate(${deg(theta)})`);
+      A.back.setAttribute('transform', `translate(${A.x + 5} ${A.y + 6}) rotate(${deg(theta)})`);
+      B.face.setAttribute('transform', `translate(${f2(B.x)} ${f2(B.y)}) rotate(${deg(rotB)})`);
+      B.back.setAttribute('transform', `translate(${f2(B.x + 5)} ${f2(B.y + 6)}) rotate(${deg(rotB)})`);
+      bCross.setAttribute('d', `M${f2(B.x - B.r - 18)} ${f2(B.y)}H${f2(B.x + B.r + 18)}M${f2(B.x)} ${f2(B.y - B.r - 18)}V${f2(B.y + B.r + 18)}`);
+      // dimension between the pitch circles, labelled above the gears
+      const dx = B.x - A.x, dy = B.y - A.y, dist = Math.hypot(dx, dy), ux = dx / dist, uy = dy / dist;
+      const gap = Math.max(0, dist - CD);
+      const p1 = { x: A.x + ux * A.r, y: A.y + uy * A.r }, p2 = { x: B.x - ux * B.r, y: B.y - uy * B.r };
+      dim.setAttribute('d', gap > 1 ? `M${f2(p1.x)} ${f2(p1.y)}L${f2(p2.x)} ${f2(p2.y)}` : '');
+      const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+      const lx = 340, ly = 66;
+      lead.setAttribute('d', `M${lx + 4} ${ly + 10}C${lx - 6} ${ly + 50} ${f2(mx + 10)} ${f2(my - 70)} ${f2(mx)} ${f2(my - 8)}`);
+      gapT.setAttribute('x', lx); gapT.setAttribute('y', ly);
+      gap2.setAttribute('x', lx + 2); gap2.setAttribute('y', ly - 26);
+      gapT.textContent = `gap = ${(gap * MM).toFixed(2)} mm`;
+      gap2.textContent = meshed ? 'meshed — within tolerance' : 'should be 0.00';
+      labelB.setAttribute('x', f2(Math.min(B.x + 18, 440)));
+      labelB.setAttribute('y', f2(Math.min(B.y + B.r + 44, 404)));
+      labelB.textContent = meshed ? 'turning too' : 'stalled';
+    }
+
+    function setMeshed() {
+      meshed = true;
+      hint.style.display = 'none';
+      note.innerHTML = '<span>fixed — now it turns. Head back home.</span>';
+      fixBtn.textContent = 'Meshed';
+      fixBtn.disabled = true;
+    }
+    function snapTo(ph, animate) {
+      const tx = A.x + CD * Math.cos(ph), ty = A.y + CD * Math.sin(ph);
+      if (!animate || reduce) { B.x = tx; B.y = ty; phi = ph; rotB = meshRot(ph); setMeshed(); paint(); return; }
+      tween = { t0: performance.now(), dur: 520, x0: B.x, y0: B.y, tx, ty, r0: rotB, ph };
+    }
+
+    let last = performance.now();
+    function tick(now) {
+      const dt = Math.min(.05, (now - last) / 1000); last = now;
+      if (!reduce) theta += 0.55 * dt;
+      if (tween) {
+        const k = Math.min(1, (now - tween.t0) / tween.dur), e = 1 - Math.pow(1 - k, 3);
+        B.x = tween.x0 + (tween.tx - tween.x0) * e;
+        B.y = tween.y0 + (tween.ty - tween.y0) * e;
+        // turn the shortest way to the meshing angle
+        let target = meshRot(tween.ph), d = target - tween.r0;
+        d = ((d % B.p) + B.p * 1.5) % B.p - B.p / 2;
+        rotB = tween.r0 + d * e;
+        if (k === 1) { phi = tween.ph; tween = null; setMeshed(); }
+      } else if (meshed) {
+        rotB = meshRot(phi);
+      }
+      paint();
+      requestAnimationFrame(tick);
+    }
+    paint();
+    requestAnimationFrame(tick);
+
+    // drag the loose gear
+    const toSvg = (e) => { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; return pt.matrixTransform(svg.getScreenCTM().inverse()); };
+    B.face.addEventListener('pointerdown', (e) => {
+      if (meshed || tween) return;
+      e.preventDefault();
+      B.face.setPointerCapture(e.pointerId);
+      const p = toSvg(e);
+      drag = { id: e.pointerId, ox: p.x - B.x, oy: p.y - B.y };
+      svg.classList.add('dragging');
+    });
+    B.face.addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const p = toSvg(e);
+      let x = Math.min(600 - B.r - 14, Math.max(B.r + 14, p.x - drag.ox));
+      let y = Math.min(420 - B.r - 14, Math.max(B.r + 14, p.y - drag.oy));
+      const dx = x - A.x, dy = y - A.y, dist = Math.hypot(dx, dy);
+      if (dist < CD) { x = A.x + dx / dist * CD; y = A.y + dy / dist * CD; }   // teeth can't pass through each other
+      B.x = x; B.y = y;
+    });
+    const release = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      drag = null;
+      svg.classList.remove('dragging');
+      const dx = B.x - A.x, dy = B.y - A.y;
+      if (Math.hypot(dx, dy) - CD < 16) snapTo(Math.atan2(dy, dx), true);
+    };
+    B.face.addEventListener('pointerup', release);
+    B.face.addEventListener('pointercancel', release);
+    fixBtn.addEventListener('click', () => { if (!meshed && !tween) snapTo(Math.atan2(B.y - A.y, B.x - A.x), true); });
+  })();
+  </script>
+</body>
+</html>
