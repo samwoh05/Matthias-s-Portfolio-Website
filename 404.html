@@ -73,10 +73,6 @@
       -webkit-mask-position: 100% 0; mask-position: 100% 0;
     }
     .hw.hw-go .w { -webkit-mask-position: 0 0; mask-position: 0 0; transition: -webkit-mask-position var(--wd, .3s) linear var(--wdl, 0s), mask-position var(--wd, .3s) linear var(--wdl, 0s); }
-    .pen { position: absolute; left: 0; top: 0; z-index: 3; overflow: visible; pointer-events: none; opacity: 0; filter: drop-shadow(1px 3px 2px rgba(4, 22, 12, .32)); }
-    .pen .pg { fill: #2a2118; } .pen .pw { fill: #e2c896; stroke: #5b4632; stroke-width: .6; }
-    .pen .pb { fill: #f1e7d2; stroke: #174a31; stroke-width: .7; } .pen .pl { fill: none; stroke: #174a31; stroke-width: .5; opacity: .45; }
-    .pen .pf { fill: #b9b3a2; stroke: #5b4632; stroke-width: .6; } .pen .pe { fill: #c98a7a; stroke: #5b4632; stroke-width: .6; }
     .lede { margin-top: 18px; max-width: 30rem; color: var(--mat-ink-2); font-size: clamp(16px, 1.3vw, 18px); }
     .ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
     .btn {
@@ -147,7 +143,6 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
       .hw .w { -webkit-mask: none !important; mask: none !important; transform: none !important; }
-      .pen { display: none !important; }
     }
   </style>
 </head>
@@ -224,12 +219,9 @@
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // ---- handwriting (same engine as the main site, trimmed) ----
-    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-    const lerp = (a, b, t) => a + (b - a) * t;
     function seeded(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } h |= 1; return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; }; }
     const charTime = (ch, r) => (/\s/.test(ch) ? 0 : (0.045 + r() * 0.03) * (/[mwMW]/.test(ch) ? 1.4 : /[iljtfr.,'’:;!|]/.test(ch) ? 0.55 : 1));
     const pauseAfter = (ch) => (/[,;:]/.test(ch) ? 0.16 : /[.!?—–…]/.test(ch) ? 0.24 : 0);
-    const PENCIL = '<g transform="rotate(-52)"><path class="pg" d="M0 0 6.5-2.3V2.3Z"/><path class="pw" d="M6.5-2.3 15-5.2V5.2L6.5 2.3Z"/><path class="pb" d="M15-5.2H46V5.2H15Z"/><path class="pl" d="M15 0H46"/><path class="pf" d="M46-5.2H51V5.2H46Z"/><path class="pe" d="M51-5.2H56Q58-5.2 58-3V3Q58 5.2 56 5.2H51Z"/></g>';
     function writeHand(el, text, delayS) {
       el.textContent = text;
       el.classList.remove('hw', 'hw-go');
@@ -253,40 +245,12 @@
         if (i > 0) { t += 0.07 + rand() * 0.07 + pauseAfter(ws[i - 1].textContent.slice(-1)); if (prevTop !== null && w.offsetTop > prevTop + fs * 0.5) t += 0.12; }
         prevTop = w.offsetTop;
         let d = 0; for (const ch of w.textContent) d += charTime(ch, rand);
-        const s = { w, t, d: Math.max(0.08, d * 1.15), x: w.offsetLeft, y: w.offsetTop, W: w.offsetWidth, H: w.offsetHeight };
+        const s = { w, t, d: Math.max(0.08, d * 1.15) };
         t += s.d; return s;
       });
-      const total = t;
       sched.forEach((s) => { s.w.style.setProperty('--wd', `${s.d.toFixed(3)}s`); s.w.style.setProperty('--wdl', `${(delayS + s.t).toFixed(3)}s`); });
       el.getBoundingClientRect();
       el.classList.add('hw-go');
-      const start = performance.now() + delayS * 1000;
-      const base = (s) => s.y + s.H - fs * 0.5;
-      const pos = (time) => {
-        let i = 0; while (i < sched.length - 1 && time >= sched[i + 1].t) i++;
-        const s = sched[i], f = (time - s.t) / s.d;
-        if (f <= 1) return { x: s.x + clamp(-0.1 * s.W + 1.2 * s.W * f, 0, s.W), y: base(s) };
-        const n = sched[i + 1]; if (!n) return { x: s.x + s.W, y: base(s) };
-        const g = clamp((time - s.t - s.d) / Math.max(0.01, n.t - s.t - s.d), 0, 1);
-        return { x: lerp(s.x + s.W, n.x, g), y: lerp(base(s), base(n), g) - Math.sin(g * Math.PI) * fs * 0.18 };
-      };
-      const pen = document.createElement('span');
-      pen.className = 'pen'; pen.setAttribute('aria-hidden', 'true');
-      const sc = fs / 24;
-      pen.innerHTML = `<svg width="${(48 * sc).toFixed(1)}" height="${(58 * sc).toFixed(1)}" viewBox="-6 -52 48 58">${PENCIL}</svg>`;
-      el.appendChild(pen);
-      const stepPen = (now) => {
-        const tt = (now - start) / 1000;
-        if (tt < -0.2) { requestAnimationFrame(stepPen); return; }
-        let p, o = 1, lift = 0;
-        if (tt < 0) { p = pos(0); o = 1 + tt / 0.2; lift = -tt / 0.2; }
-        else if (tt <= total) { p = pos(tt); p = { x: p.x + Math.sin(now / 1000 * 2 * Math.PI * 11) * fs * 0.025, y: p.y + Math.sin(now / 1000 * 2 * Math.PI * 7.5) * fs * 0.06 }; }
-        else { const k = Math.min(1, (tt - total) / 0.4); p = pos(total); o = 1 - k; lift = k; if (k >= 1) { pen.remove(); return; } }
-        pen.style.opacity = o.toFixed(2);
-        pen.style.transform = `translate(${(p.x + lift * fs * 0.5 - 6 * sc).toFixed(1)}px, ${(p.y - lift * fs * 0.8 - 52 * sc).toFixed(1)}px)`;
-        requestAnimationFrame(stepPen);
-      };
-      requestAnimationFrame(stepPen);
     }
     const svg = document.getElementById('stage');
     const mk = (t, a, p) => { const n = document.createElementNS(NS, t); for (const k in a) n.setAttribute(k, a[k]); p && p.appendChild(n); return n; };
@@ -409,7 +373,7 @@
     }
     paint();
     requestAnimationFrame(tick);
-    if (!reduce) note.style.opacity = '0';          // hidden until the pen writes it
+    if (!reduce) note.style.opacity = '0';          // hidden until it writes itself on
     const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
     Promise.race([fontsReady, new Promise((r) => setTimeout(r, 900))]).then(() => { note.style.opacity = ''; writeHand(note, note.textContent, 0.45); });
 

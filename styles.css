@@ -204,7 +204,7 @@ h1, h2, h3 { font-weight: 400; }
 .js .draw.is-drawn .fade-in { opacity: 1; }
 
 /* Handwriting: each word inks in behind a soft leading edge, at its own pace,
-   with a slightly uneven baseline; a pencil rides the writing point (script.js) */
+   with a slightly uneven baseline (timing set in script.js) */
 .hw { position: relative; }
 .hw .w {
   display: inline-block;
@@ -226,16 +226,6 @@ h1, h2, h3 { font-weight: 400; }
           mask-position: 0 0;
   transition: -webkit-mask-position var(--wd, .3s) linear var(--wdl, 0s), mask-position var(--wd, .3s) linear var(--wdl, 0s);
 }
-.pen { position: absolute; left: 0; top: 0; z-index: 3; overflow: visible; pointer-events: none; opacity: 0; will-change: transform, opacity; filter: drop-shadow(1px 3px 2px rgba(4, 22, 12, .32)); }
-.pen, .pen-g { --pen-body: #f1e7d2; --pen-line: #174a31; }
-.pen--paper { --pen-body: #1d5a3c; --pen-line: #2a2118; }
-.pen-g { pointer-events: none; opacity: 0; filter: drop-shadow(1px 2px 1.5px rgba(42, 33, 24, .3)); }
-.pen .pg, .pen-g .pg { fill: #2a2118; }
-.pen .pw, .pen-g .pw { fill: #e2c896; stroke: #5b4632; stroke-width: .6; }
-.pen .pb, .pen-g .pb { fill: var(--pen-body); stroke: var(--pen-line); stroke-width: .7; }
-.pen .pl, .pen-g .pl { fill: none; stroke: var(--pen-line); stroke-width: .5; opacity: .45; }
-.pen .pf, .pen-g .pf { fill: #b9b3a2; stroke: #5b4632; stroke-width: .6; }
-.pen .pe, .pen-g .pe { fill: #c98a7a; stroke: #5b4632; stroke-width: .6; }
 .js .draw .svg-hand.fade-in {
   opacity: 1;
   clip-path: inset(-30% 100% -40% -4%);
@@ -1050,7 +1040,6 @@ input[type="range"]::-moz-range-thumb {
   .js .reveal, .js .hero [data-in], .js .draw .fade-in { opacity: 1 !important; transform: none !important; }
   .js .draw .svg-hand.fade-in { clip-path: none !important; }
   .hw .w { -webkit-mask: none !important; mask: none !important; transform: none !important; }
-  .pen, .pen-g { display: none !important; }
   .js .hero h1 .line > span { transform: none !important; }
   .js .hero .hero-sheet[data-in] { transform: none !important; }
   .anim-swing { transform: rotate(-30deg); }

@@ -413,28 +413,12 @@
     return start;
   }
 
-  // Pencil, drawn tip-at-origin and angled up to the right
-  const PENCIL = '<g transform="rotate(-52)"><path class="pg" d="M0 0 6.5-2.3V2.3Z"/><path class="pw" d="M6.5-2.3 15-5.2V5.2L6.5 2.3Z"/><path class="pb" d="M15-5.2H46V5.2H15Z"/><path class="pl" d="M15 0H46"/><path class="pf" d="M46-5.2H51V5.2H46Z"/><path class="pe" d="M51-5.2H56Q58-5.2 58-3V3Q58 5.2 56 5.2H51Z"/></g>';
-
-  // Drives the pencil along pos(t) from `start` (ms) for `total` (s), then lifts it away
-  function runPen(pen, start, total, fs, pos, place, done) {
-    let finished = false;
+  // Calls onFrame(t) every frame from `start` (ms) for `total` (s), then done()
+  function runFrames(start, total, onFrame, done) {
     const step = (now) => {
       const t = (now - start) / 1000;
-      if (t < -0.2) { requestAnimationFrame(step); return; }
-      let p, o = 1, lift = 0;
-      if (t < 0) { p = pos(0); o = 1 + t / 0.2; lift = -t / 0.2; }
-      else if (t <= total) {
-        p = pos(t);
-        // the small up-and-down of forming letters
-        p = { x: p.x + Math.sin(now / 1000 * 2 * Math.PI * 11) * fs * 0.025, y: p.y + Math.sin(now / 1000 * 2 * Math.PI * 7.5) * fs * 0.06 };
-      } else {
-        if (!finished) { finished = true; if (done) done(); }
-        const k = Math.min(1, (t - total) / 0.4);
-        p = pos(total); o = 1 - k; lift = k;
-        if (k >= 1) { pen.remove(); return; }
-      }
-      place(p.x + lift * fs * 0.5, p.y - lift * fs * 0.8, o);
+      if (t > total) { if (done) done(); return; }
+      if (t >= 0) onFrame(t);
       requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
@@ -477,7 +461,7 @@
       let d = 0;
       for (const ch of w.textContent) d += charTime(ch, rand);
       d = Math.max(0.08, d * 1.15);
-      const s = { w, t, d, x: o.x, y: o.y, W: w.offsetWidth, H: w.offsetHeight };
+      const s = { w, t, d };
       t += d;
       return s;
     });
@@ -493,33 +477,10 @@
     });
     el.getBoundingClientRect();
     el.classList.add('hw-go');
-
-    const baseline = (s) => s.y + s.H - fs * 0.5;
-    const pos = (time) => {
-      let i = 0;
-      while (i < sched.length - 1 && time >= sched[i + 1].t) i++;
-      const s = sched[i];
-      const f = (time - s.t) / s.d;
-      if (f <= 1) return { x: s.x + clamp(-0.1 * s.W + 1.2 * s.W * f, 0, s.W), y: baseline(s) };
-      const n = sched[i + 1];                                  // between words: glide to the next one
-      if (!n) return { x: s.x + s.W, y: baseline(s) };
-      const g = clamp((time - s.t - s.d) / Math.max(0.01, n.t - s.t - s.d), 0, 1);
-      return { x: lerp(s.x + s.W, n.x, g), y: lerp(baseline(s), baseline(n), g) - Math.sin(g * Math.PI) * fs * 0.18 };
-    };
-    const pen = document.createElement('span');
-    pen.className = `pen${el.closest('.paper') ? ' pen--paper' : ''}`;
-    pen.setAttribute('aria-hidden', 'true');
-    const sc = fs / 24;
-    pen.innerHTML = `<svg width="${(48 * sc).toFixed(1)}" height="${(58 * sc).toFixed(1)}" viewBox="-6 -52 48 58">${PENCIL}</svg>`;
-    el.appendChild(pen);
-    const place = (x, y, o) => {
-      pen.style.opacity = o.toFixed(2);
-      pen.style.transform = `translate(${(x - 6 * sc).toFixed(1)}px, ${(y - 52 * sc).toFixed(1)}px)`;
-    };
-    runPen(pen, start, total, fs, pos, place, done);
+    if (done) setTimeout(done, (lead + total) * 1000);
   }
 
-  // Handwritten SVG labels in the sketches: revealed letter by letter behind the pencil
+  // Handwritten SVG labels in the sketches: revealed letter by letter at writing pace
   function writeSvgText(txt, delayS) {
     const reveal = () => { txt.style.clipPath = 'none'; };
     let n = 0, bb, xs = [];
@@ -529,7 +490,6 @@
       for (let i = 0; i < n; i++) xs.push([txt.getStartPositionOfChar(i), txt.getEndPositionOfChar(i)]);
     } catch (e) { n = 0; }
     if (!n || !bb || !bb.width) { reveal(); return; }
-    const fs = parseFloat(txt.getAttribute('font-size')) || 20;
     const rand = seeded(txt.textContent);
     const chars = Array.from(txt.textContent);
     let t = 0;
@@ -546,33 +506,15 @@
     total *= k;
     const start = enqueue(txt, performance.now() + delayS * 1000, total * 1000);
     const right = bb.x + bb.width;
-    const pos = (time) => {
+    const front = (time) => {
       let i = 0;
       while (i < sched.length - 1 && time >= sched[i + 1].t) i++;
       const s = sched[i];
-      const f = clamp((time - s.t) / s.d, 0, 1);
-      return { x: lerp(s.x0, s.x1, f), y: s.y - fs * 0.12 };
+      return lerp(s.x0, s.x1, clamp((time - s.t) / s.d, 0, 1));
     };
-    const g = document.createElementNS(NS, 'g');
-    g.setAttribute('class', `pen-g${txt.closest('.paper') ? ' pen--paper' : ''}`);
-    g.setAttribute('aria-hidden', 'true');
-    g.innerHTML = PENCIL;
-    txt.parentNode.appendChild(g);
-    const sc = fs / 24;
-    let writing = false;
-    const place = (x, y, o) => {
-      g.style.opacity = o.toFixed(2);
-      g.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${sc.toFixed(3)})`);
-      const now = (performance.now() - start) / 1000;
-      if (now >= 0 && now <= total) {
-        writing = true;
-        const front = pos(now).x;
-        txt.style.clipPath = `inset(-60% ${Math.max(0, right - front).toFixed(1)}px -70% -10%)`;
-      } else if (writing && now > total) {
-        reveal();
-      }
-    };
-    runPen(g, start, total, fs, pos, place, reveal);
+    runFrames(start, total, (time) => {
+      txt.style.clipPath = `inset(-60% ${Math.max(0, right - front(time)).toFixed(1)}px -70% -10%)`;
+    }, reveal);
   }
 
   const handTargets = $$('.quote-note q, .sec-note, .contact .sign, .given .tag, .therefore .tag, .gpa-note, .next-head .hand, .bench-note, .sheet-hint');
