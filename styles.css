@@ -800,6 +800,32 @@ input[type="range"]::-moz-range-thumb {
 @keyframes roll { 0%, 8% { offset-distance: 0%; } 70%, 100% { offset-distance: 100%; } }
 .anim-flap { transform-box: fill-box; transform-origin: 50% 100%; animation: flap .16s ease-in-out infinite alternate; animation-play-state: paused; }
 @keyframes flap { from { transform: scaleY(1); } to { transform: scaleY(.55); } }
+/* Np Node: the bulb lights up and flickers irregularly on hover.
+   Glow, glass and rays run on different loop lengths so the pattern never visibly repeats. */
+.bulb-glow { opacity: 0; pointer-events: none; }
+.bulb-glass { fill: #ffe7a3; stroke: none; opacity: 0; }
+/* applied only while hovered, so the bulb switches on fresh each time and goes dark on leave */
+.card:hover .anim-glow, .card:focus-within .anim-glow { animation: bulb-glow 2.3s steps(1, end) infinite; }
+.card:hover .anim-glass, .card:focus-within .anim-glass { animation: bulb-glass 3.7s steps(1, end) infinite; }
+.card:hover .anim-rays, .card:focus-within .anim-rays { animation: bulb-rays 2.3s steps(1, end) infinite; }
+.card:hover .anim-filament, .card:focus-within .anim-filament { animation: bulb-filament 1.3s steps(1, end) infinite; }
+@keyframes bulb-glow {
+  0% { opacity: 0; } 4% { opacity: .95; } 8% { opacity: .2; } 10% { opacity: .9; } 23% { opacity: .8; } 25% { opacity: .1; }
+  27% { opacity: .95; } 46% { opacity: .75; } 48% { opacity: .3; } 49% { opacity: .9; } 64% { opacity: .85; } 66% { opacity: 0; }
+  71% { opacity: .1; } 73% { opacity: .9; } 88% { opacity: .8; } 90% { opacity: .35; } 92% { opacity: .95; }
+}
+@keyframes bulb-glass {
+  0% { opacity: 0; } 3% { opacity: .75; } 17% { opacity: .55; } 19% { opacity: .15; } 21% { opacity: .7; } 52% { opacity: .65; }
+  54% { opacity: .05; } 58% { opacity: .7; } 81% { opacity: .5; } 82% { opacity: .2; } 84% { opacity: .75; }
+}
+@keyframes bulb-rays {
+  0% { opacity: 1; } 8% { opacity: .25; } 10% { opacity: 1; } 25% { opacity: .2; } 27% { opacity: 1; } 48% { opacity: .45; }
+  49% { opacity: 1; } 66% { opacity: .1; } 73% { opacity: 1; } 90% { opacity: .4; } 92% { opacity: 1; }
+}
+@keyframes bulb-filament {
+  0% { opacity: 1; } 21% { opacity: .35; } 24% { opacity: 1; } 57% { opacity: .55; } 59% { opacity: 1; } 83% { opacity: .2; } 86% { opacity: 1; }
+}
+
 .anim-pulse { transform-box: fill-box; transform-origin: center; animation: pulse 1.4s var(--ease) infinite; animation-play-state: paused; }
 .anim-pulse:nth-of-type(2n) { animation-delay: -.7s; }
 @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
@@ -1086,10 +1112,65 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ----------------------------------------------------------
+   Transitions — intro cover sheet + sheet flip (transitions.js)
+   ---------------------------------------------------------- */
+.intro { position: fixed; inset: 0; z-index: 300; display: none; }
+.intro-on .intro, .intro.is-lifting { display: block; }
+.intro-on, .intro-on body { overflow: hidden; }
+.intro-sheet {
+  position: absolute; inset: 0; border-radius: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: transform .95s cubic-bezier(.7, 0, .2, 1);
+}
+.intro.is-lifting .intro-sheet { transform: translateY(-106%) rotate(-2.5deg); }
+.intro-center { display: flex; flex-direction: column; align-items: center; text-align: center; transform: translateY(-4vh); }
+.intro-logo { width: clamp(110px, 13vw, 168px); height: auto; overflow: visible; }
+.intro-logo .lg-line { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: intro-ink 1.25s cubic-bezier(.5, 0, .3, 1) .15s forwards; }
+.intro-logo .lg-fill { fill: #12503f; opacity: 0; animation: intro-fade .55s var(--ease) 1.05s forwards; }
+.intro-name { margin-top: 26px; font-size: clamp(30px, 3.6vw, 46px); line-height: 1; letter-spacing: -.03em; color: var(--ink); opacity: 0; animation: intro-rise .8s var(--ease-out) .55s forwards; }
+.intro-meta { margin-top: 14px; color: var(--ink-2); opacity: 0; animation: intro-rise .8s var(--ease-out) .72s forwards; }
+.intro-load { position: absolute; left: 50%; bottom: clamp(36px, 9vh, 88px); width: min(440px, 72vw); transform: translateX(-50%); }
+.intro-ruler {
+  position: relative; height: 16px; border-bottom: 1.5px solid var(--ink);
+  background:
+    repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 44px) left bottom / 100% 14px no-repeat,
+    repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 22px) left bottom / 100% 9px no-repeat,
+    repeating-linear-gradient(90deg, rgba(42, 33, 24, .55) 0 1px, transparent 1px 4.4px) left bottom / 100% 5px no-repeat;
+}
+.intro-bar { position: absolute; left: 0; right: 0; bottom: -1.5px; height: 4px; background: var(--pencil); transform: scaleX(0); transform-origin: left; }
+.intro-count { display: flex; justify-content: space-between; margin-top: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.intro-count b { color: var(--ink); font-weight: 500; }
+.intro.is-done .intro-count b { color: var(--pencil); }
+@keyframes intro-ink { to { stroke-dashoffset: 0; } }
+@keyframes intro-fade { to { opacity: 1; } }
+@keyframes intro-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+.flip { position: fixed; inset: 0; z-index: 250; display: none; overflow: hidden; }
+.flip.is-on { display: block; }
+.flip-sheet {
+  position: absolute; inset: 0; border-radius: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+  padding: 0 var(--gutter); text-align: center;
+  transform: translateX(104%);
+}
+.flip-no { color: var(--pencil) !important; }
+.flip-name { font-size: clamp(60px, 10vw, 148px); line-height: .9; letter-spacing: -.045em; color: var(--ink); }
+.flip-sub { max-width: 22ch; font-size: clamp(20px, 2.4vw, 30px); line-height: 1.2; font-style: italic; font-weight: 300; color: var(--ink-2); text-wrap: balance; }
+
+/* page to page (portfolio ↔ 404): the old sheet slides up and away */
+@view-transition { navigation: auto; types: sheet; }
+html:active-view-transition-type(sheet)::view-transition-old(root) { animation: vt-sheet-out .55s cubic-bezier(.7, 0, .25, 1) both; }
+html:active-view-transition-type(sheet)::view-transition-new(root) { animation: vt-sheet-in .6s cubic-bezier(.2, .7, .2, 1) .1s both; }
+@keyframes vt-sheet-out { to { transform: translateY(-8%) rotate(-1.5deg); opacity: 0; } }
+@keyframes vt-sheet-in { from { transform: translateY(5%); opacity: 0; } }
+
+/* ----------------------------------------------------------
    Reduced motion
    ---------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+  .intro, .flip { display: none !important; }
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
   .js .reveal, .js .hero [data-in], .js .draw .fade-in { opacity: 1 !important; transform: none !important; }
   .js .draw .svg-hand.fade-in { clip-path: none !important; }

@@ -24,13 +24,42 @@
   <meta name="twitter:description" content="Creativity + helping others = product design. Projects, physics bench tests and UI/UX work.">
   <meta name="twitter:image" content="https://samwoh05.github.io/Matthias-s-Portfolio-Website/og-image.jpg">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='221 196 600 600'%3E%3Crect x='221' y='196' width='600' height='600' rx='110' fill='%23E5DBC7'/%3E%3Cpath fill='%2312503F' d='M257 383 344 452 450 355V700L401 662V471L347 519 305 488V640H257ZM471 335 519 292V657H667L689 700H471ZM622 383 785 700H722L680 614H566L586 572H657L614 487 535 627V533Z'/%3E%3C/svg%3E">
-  <script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.__mlaReady)document.documentElement.classList.remove('js')},3000);</script>
+  <script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.__mlaReady)document.documentElement.classList.remove('js')},3000);
+  /* intro cover sheet: once per visit, never with reduced motion; removed if the script never arrives */
+  try{if(!sessionStorage.getItem('mla-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('intro-on')}catch(e){}
+  setTimeout(function(){if(!window.__mlaIntro)document.documentElement.classList.remove('intro-on')},3500);</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Intro cover sheet (first visit) -->
+  <div class="intro" id="intro" aria-hidden="true">
+    <div class="paper intro-sheet">
+      <div class="intro-center">
+        <svg class="intro-logo" viewBox="240 275 565 442">
+          <path class="lg-fill" d="M257 383 344 452 450 355V700L401 662V471L347 519 305 488V640H257ZM471 335 519 292V657H667L689 700H471ZM622 383 785 700H722L680 614H566L586 572H657L614 487 535 627V533Z"/>
+          <path class="lg-line" pathLength="1" d="M257 383 344 452 450 355V700L401 662V471L347 519 305 488V640H257ZM471 335 519 292V657H667L689 700H471ZM622 383 785 700H722L680 614H566L586 572H657L614 487 535 627V533Z"/>
+        </svg>
+        <p class="intro-name">Matthias Luc Ang</p>
+        <p class="mono intro-meta">Drawing set · Sheets 01–07 · 2026</p>
+      </div>
+      <div class="intro-load">
+        <div class="intro-ruler"><span class="intro-bar"></span></div>
+        <p class="mono intro-count"><span>Loading sheets</span><span><b id="intro-pct">000</b> %</span></p>
+      </div>
+    </div>
+  </div>
+  <!-- Sheet flip between sections -->
+  <div class="flip" id="flip" aria-hidden="true">
+    <div class="paper flip-sheet">
+      <p class="mono flip-no"></p>
+      <p class="flip-name"></p>
+      <p class="flip-sub"></p>
+    </div>
+  </div>
+
   <a class="skip" href="#main">Skip to content</a>
 
   <!-- Shared drawing defs: hatching and arrowheads -->
@@ -39,6 +68,11 @@
       <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(42)">
         <path d="M0 0V5" stroke="#5b4632" stroke-width=".9" opacity=".7"/>
       </pattern>
+      <radialGradient id="bulb-glow">
+        <stop offset="0" stop-color="#ffd56b" stop-opacity=".9"/>
+        <stop offset=".45" stop-color="#ffd56b" stop-opacity=".38"/>
+        <stop offset="1" stop-color="#ffd56b" stop-opacity="0"/>
+      </radialGradient>
       <pattern id="hatch-x" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(42)">
         <path d="M0 0V5M0 2.5H5" stroke="#5b4632" stroke-width=".7" opacity=".65"/>
       </pattern>
@@ -356,10 +390,12 @@
               <div class="card-art draw" data-step=".04">
                 <svg viewBox="0 0 400 260" aria-hidden="true">
                   <path class="blue fade-in" data-delay=".5" d="M182 112 82 64M180 128 76 170M190 146 134 222M212 146 288 224M222 126 342 150M216 106 318 56M82 64 76 170M134 222 288 224M342 150 318 56"/>
+                  <circle class="bulb-glow anim-glow" cx="200" cy="106" r="62" fill="url(#bulb-glow)"/>
+                  <path class="bulb-glass anim-glass" d="M184 132C170 120 168 88 200 82C232 88 230 120 216 132V146H184Z"/>
                   <path class="ink" data-draw d="M184 132C170 120 168 88 200 82C232 88 230 120 216 132V146H184Z"/>
                   <path class="ink-2" data-draw d="M186 152H214M189 159H211M195 166H205"/>
-                  <path class="ink-2" data-draw d="M191 128l4-16 5 11 5-11 4 16"/>
-                  <path class="ink-2" data-draw d="M200 70v-12M234 84l9-8M166 84l-9-8M244 112h12M144 112h12"/>
+                  <path class="ink-2 anim-filament" data-draw d="M191 128l4-16 5 11 5-11 4 16"/>
+                  <path class="ink-2 anim-rays" data-draw d="M200 70v-12M234 84l9-8M166 84l-9-8M244 112h12M144 112h12"/>
                   <circle class="ink fill-paper anim-pulse" cx="72" cy="60" r="12"/>
                   <circle class="ink fill-paper anim-pulse" cx="66" cy="172" r="12"/>
                   <circle class="ink fill-paper anim-pulse" cx="130" cy="230" r="12"/>
@@ -868,6 +904,7 @@
     </div>
   </footer>
 
+  <script src="transitions.js"></script>
   <script src="script.js"></script>
   <script src="ideas.js"></script>
 </body>

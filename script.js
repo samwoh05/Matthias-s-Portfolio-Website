@@ -547,7 +547,8 @@
       setTimeout(() => drawNow(gearSvg), reduce ? 0 : 250);
     };
     const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
-    Promise.race([fontsReady, new Promise((r) => setTimeout(r, 900))]).then(() => requestAnimationFrame(go));
+    const introDone = window.__mlaIntro || Promise.resolve();   // wait for the cover sheet to lift (transitions.js)
+    Promise.all([Promise.race([fontsReady, new Promise((r) => setTimeout(r, 900))]), introDone]).then(() => requestAnimationFrame(go));
   }
 
   /* ----------------------------------------------------------
