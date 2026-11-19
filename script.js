@@ -517,7 +517,7 @@
     }, reveal);
   }
 
-  const handTargets = $$('.quote-note q, .sec-note, .contact .sign, .given .tag, .therefore .tag, .gpa-note, .next-head .hand, .bench-note, .sheet-hint');
+  const handTargets = $$('.quote-note q, .sec-note, .contact .sign, .given .tag, .therefore .tag, .gpa-note, .bench-note, .sheet-hint, .idea-q li');
   handTargets.forEach(prepHand);
   const handIO = new IntersectionObserver((entries) => {
     entries.forEach((en) => {
@@ -587,7 +587,7 @@
 
   const links = $$('.nav-links a');
   const roS = $('#ro-s');
-  const sheetNo = { top: '01', about: '02', work: '03', lab: '04', spec: '05', contact: '06' };
+  const sheetNo = { top: '01', about: '02', work: '03', lab: '04', ideas: '05', spec: '06', contact: '07' };
   const secIO = new IntersectionObserver((entries) => {
     entries.forEach((en) => {
       if (!en.isIntersecting) return;
