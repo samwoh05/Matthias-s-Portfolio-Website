@@ -378,6 +378,8 @@
     rp.addEventListener('click', () => { t = 0; draw(); setPlay(true); });
     sc.addEventListener('input', () => { setPlay(false); t = Number(sc.value) / 1000; draw(); });
     new IntersectionObserver(([en]) => { visible = en.isIntersecting; run(); }, { threshold: 0.15 }).observe(cv);
+    // re-read the palette when the theme changes (canvas colours are not CSS)
+    window.addEventListener('mla:theme', () => { C = null; if (active) draw(); });
     setPlay(playing);
     return {
       activate(on) { active = on; if (on) { layout(); draw(); run(); } },

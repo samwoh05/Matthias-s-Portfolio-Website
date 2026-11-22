@@ -28,6 +28,8 @@
   <script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.__mlaReady)document.documentElement.classList.remove('js')},3000);
   /* intro cover sheet: once per visit, never with reduced motion; removed if the script never arrives */
   try{if(!sessionStorage.getItem('mla-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('intro-on')}catch(e){}
+  /* theme: saved choice, else the system setting — set before first paint so there is no flash */
+  (function(){var t;try{t=localStorage.getItem('mla-theme')}catch(e){}if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='dark'?'#0f2a1d':'#1d5a3c'})();
   setTimeout(function(){if(!window.__mlaIntro)document.documentElement.classList.remove('intro-on')},3500);</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -106,12 +108,19 @@
           <svg viewBox="250 285 545 422"><path d="M257 383 344 452 450 355V700L401 662V471L347 519 305 488V640H257ZM471 335 519 292V657H667L689 700H471ZM622 383 785 700H722L680 614H566L586 572H657L614 487 535 627V533Z"/></svg>
         </span>
       </a>
-      <ul class="nav-links nav-links--r mono">
-        <li><a href="#ideas">Ideas</a></li>
-        <li><a href="#spec">Spec</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-      <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
+      <div class="nav-end">
+        <ul class="nav-links nav-links--r mono">
+          <li><a href="#ideas">Ideas</a></li>
+          <li><a href="#spec">Spec</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <!-- desk-lamp switch: light / dark -->
+        <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark mode" title="Switch to dark mode">
+          <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1Z"/><path d="M16.5 4.5v2.4M15.3 5.7h2.4"/></svg>
+          <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.3M12 19.1v2.3M2.6 12h2.3M19.1 12h2.3M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6"/></svg>
+        </button>
+        <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
+      </div>
     </nav>
   </header>
 

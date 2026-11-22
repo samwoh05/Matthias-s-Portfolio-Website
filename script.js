@@ -579,6 +579,45 @@
   drawScopes.forEach((s) => drawIO.observe(s));
 
   /* ----------------------------------------------------------
+     Theme: light / dark (desk-lamp switch)
+     The head script already set data-theme before paint.
+     ---------------------------------------------------------- */
+  (function theme() {
+    const btn = $('.theme-toggle');
+    if (!btn) return;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const meta = $('meta[name="theme-color"]');
+    let saved = null;
+    try { saved = localStorage.getItem('mla-theme'); } catch (e) { /* storage blocked */ }
+    const current = () => root.getAttribute('data-theme') || (mq.matches ? 'dark' : 'light');
+    function apply(t) {
+      root.setAttribute('data-theme', t);
+      const dark = t === 'dark';
+      btn.setAttribute('aria-pressed', String(dark));
+      const label = dark ? 'Switch to light mode' : 'Switch to dark mode';
+      btn.setAttribute('aria-label', label);
+      btn.title = label;
+      if (meta) meta.content = dark ? '#0f2a1d' : '#1d5a3c';
+      window.dispatchEvent(new CustomEvent('mla:theme', { detail: t }));
+    }
+    apply(current());
+    btn.addEventListener('click', () => {
+      const next = current() === 'dark' ? 'light' : 'dark';
+      saved = next;
+      try { localStorage.setItem('mla-theme', next); } catch (e) { /* not saved, still switches */ }
+      if (reduce || !document.startViewTransition) { apply(next); return; }
+      // the new theme spreads out in a circle from the switch
+      const r = btn.getBoundingClientRect();
+      root.style.setProperty('--tx', `${Math.round(r.left + r.width / 2)}px`);
+      root.style.setProperty('--ty', `${Math.round(r.top + r.height / 2)}px`);
+      try { document.startViewTransition({ update: () => apply(next), types: ['theme'] }); }
+      catch (e) { document.startViewTransition(() => apply(next)); }
+    });
+    // follow the system setting live, until the visitor picks one themselves
+    mq.addEventListener('change', (e) => { if (saved !== 'dark' && saved !== 'light') apply(e.matches ? 'dark' : 'light'); });
+  })();
+
+  /* ----------------------------------------------------------
      Nav: solid on scroll, active section, mobile menu
      ---------------------------------------------------------- */
   const nav = $('#nav');

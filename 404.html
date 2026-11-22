@@ -7,13 +7,14 @@
   <meta name="description" content="This page doesn't exist. Head back to Matthias Luc Ang's portfolio.">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#1d5a3c">
+  <script>(function(){var t;try{t=localStorage.getItem('mla-theme')}catch(e){}if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);if(t==='dark')document.querySelector('meta[name=theme-color]').content='#0f2a1d'})();</script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='221 196 600 600'%3E%3Crect x='221' y='196' width='600' height='600' rx='110' fill='%23E5DBC7'/%3E%3Cpath fill='%2312503F' d='M257 383 344 452 450 355V700L401 662V471L347 519 305 488V640H257ZM471 335 519 292V657H667L689 700H471ZM622 383 785 700H722L680 614H566L586 572H657L614 487 535 627V533Z'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..400&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
   <!-- Self-contained on purpose: GitHub Pages serves this file at any broken URL depth, where relative links to styles.css would break. -->
   <style>
-    html, body { background: #1d5a3c; }
+    html, body { background: var(--mat, #1d5a3c); }
     :root {
       --mat: #1d5a3c; --mat-deep: #174a31; --mat-line: 143 198 161;
       --mat-ink: #e9f2e4; --mat-ink-rgb: 233 242 228; --mat-ink-2: #c3d9c6; --mat-ink-3: #a9c9b2;
@@ -21,7 +22,20 @@
       --f-display: "Fraunces", Georgia, serif; --f-hand: "Caveat", "Segoe Print", cursive; --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
       --ease-out: cubic-bezier(.22, 1, .36, 1); --ease: cubic-bezier(.4, 0, .2, 1);
       --gutter: clamp(20px, 5vw, 56px);
+      --vignette: rgba(4, 22, 12, .34); --paper-glow: rgba(255, 252, 244, .55); --paper-vig: inset 0 0 46px rgba(140, 105, 60, .13);
+      color-scheme: light;
     }
+    /* dark mode: same palette as the main site, picked up from the saved choice or the system */
+    :root[data-theme="dark"] {
+      --mat: #0f2a1d; --mat-deep: #0b2016; --mat-line: 120 170 140;
+      --mat-ink: #e3ecdf; --mat-ink-rgb: 227 236 223; --mat-ink-2: #b5c9b9; --mat-ink-3: #93ad9a;
+      --paper: #22211c; --paper-2: #2d2b24; --ink: #ece3cf; --ink-2: #c3b69c; --ink-3: #8d8270; --pencil: #93a4f2;
+      --vignette: rgba(0, 0, 0, .55); --paper-glow: rgba(255, 236, 200, .05); --paper-vig: inset 0 0 50px rgba(0, 0, 0, .35);
+      color-scheme: dark;
+    }
+    #hatch path { stroke: var(--ink-2); }
+    #ab path { stroke: var(--pencil); }
+    svg [stroke="#2a2118"] { stroke: var(--ink); }
     *, *::before, *::after { box-sizing: border-box; }
     * { margin: 0; }
     html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
@@ -39,7 +53,7 @@
       background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
-    body::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse 120% 90% at 50% 40%, transparent 55%, rgba(4, 22, 12, .34) 100%); }
+    body::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse 120% 90% at 50% 40%, transparent 55%, var(--vignette) 100%); }
     ::selection { background: rgba(233, 242, 228, .28); }
     a { color: inherit; }
     button { font: inherit; color: inherit; cursor: pointer; }
@@ -92,13 +106,13 @@
 
     .sheet {
       position: relative; color: var(--ink); border-radius: 3px; transform: rotate(-1.4deg);
-      box-shadow: 0 1px 1px rgba(6, 24, 14, .25), 0 8px 18px rgba(6, 24, 14, .28), 0 26px 50px rgba(6, 24, 14, .22), inset 0 0 46px rgba(140, 105, 60, .13);
+      box-shadow: 0 1px 1px rgba(6, 24, 14, .25), 0 8px 18px rgba(6, 24, 14, .28), 0 26px 50px rgba(6, 24, 14, .22), var(--paper-vig);
       background:
         linear-gradient(var(--ink-3), var(--ink-3)) 12px 12px / 14px 1px no-repeat,
         linear-gradient(var(--ink-3), var(--ink-3)) 12px 12px / 1px 14px no-repeat,
         linear-gradient(var(--ink-3), var(--ink-3)) right 12px bottom 12px / 14px 1px no-repeat,
         linear-gradient(var(--ink-3), var(--ink-3)) right 12px bottom 12px / 1px 14px no-repeat,
-        radial-gradient(ellipse at 28% 18%, rgba(255, 252, 244, .55), transparent 62%),
+        radial-gradient(ellipse at 28% 18%, var(--paper-glow), transparent 62%),
         var(--paper);
     }
     .sheet svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
@@ -118,7 +132,7 @@
     .smono { font-family: var(--f-mono); font-weight: 500; fill: var(--ink-2); letter-spacing: .08em; text-transform: uppercase; }
     .sheet-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 16px; padding: 0 22px 20px; }
     .sheet-foot .mono { color: var(--ink-2); font-size: 10.5px; }
-    .fix { min-height: 40px; padding: 0 16px; border-radius: 99px; border: 1px solid rgba(42, 33, 24, .5); background: transparent; color: var(--ink); font: 500 11px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; transition: background-color .2s, color .2s; }
+    .fix { min-height: 40px; padding: 0 16px; border-radius: 99px; border: 1px solid var(--ink-3); background: transparent; color: var(--ink); font: 500 11px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; transition: background-color .2s, color .2s; }
     .fix:hover { background: var(--ink); color: var(--paper); }
     .fix:focus-visible { outline-color: var(--pencil); }
 
